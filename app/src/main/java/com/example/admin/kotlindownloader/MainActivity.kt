@@ -1,45 +1,174 @@
 package com.example.admin.kotlindownloader
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import com.liulishuo.filedownloader.BaseDownloadTask
+import com.liulishuo.filedownloader.FileDownloadListener
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 
 
 class MainActivity : AppCompatActivity() {
+
+    private val downManage: DownloadManager2 by lazy { DownloadManager2.get() }
+    var downEntity :DownloadEntity ? = null
+    var downEntity2 :DownloadEntity ? = null
+    var downEntity3 :DownloadEntity ? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        Log.i("linzehao", "000")
 
+        downManage.initManager(this)
+        downEntity = DownloadEntity("111.apk","http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk")
+        downEntity2 = DownloadEntity("222.apk","http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk")
+        downEntity3 = DownloadEntity("333.apk","http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk")
 
-        var downManager = DownloadManager.get()
-        downManager.initManager(this)
+        start_btn_1.run {
+            start_btn_1.setOnClickListener {
+                downManage.addTask(downEntity!!)
+                downManage.addTask(downEntity2!!)
+                downManage.addTask(downEntity3!!)
+            }
 
-        downManager.addTask("http://cdn-l.llsapp.com/connett/7b6b5485-0d19-476c-816c-ff6523fae539")
-        downManager.addTask("http://cdn-l.llsapp.com/connett/33fa9155-c99a-407f-8d2c-82e9d17f4c32")
-        downManager.addTask("http://cdn.llsapp.com/forum/image/22f8389542734b05986c0b0dd8fd1735_1435230013392.jpg")
-        downManager.addTask("http://cdn.llsapp.com/forum/image/2e6b8f9676aa47228aad74dd37709b0e_1446202991820.jpg")
-//        downManager.addTask("http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk")
-        downManager.addTask("http://cdn.llsapp.com/forum/image/f82192fa9f764af396579e51afeb9aaf_1435049606128.jpg")
-        downManager.addTask("http://cdn.llsapp.com/forum/image/f74026981afa42e0b73a6983450deca1_1441780286505.jpg")
-
-//        downManager.addTask("http://180.153.105.144/dd.myapp.com/16891/E2F3DEBB12A049ED921C6257C5E9FB11.apk")
-//        var sss = DownloadManager
-//        sss.get()
-
-        "http://cdn.llsapp.com/android/LLS-v4.0-595-20160908-143200.apk"
-
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
         }
+
+        pause_btn_1.run {
+            pause_btn_1.setOnClickListener {
+                downManage.pauseTask(downEntity!!)
+            }
+        }
+
+        delete_btn_1.run {
+//            downManage.removeTask(downEntity!!)
+        }
+
+        progressBar_1.run {
+            downEntity?.downloadListten =object : DownloadManager2.DownloadListten {
+                override fun pending(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                }
+
+                override fun connected(task: BaseDownloadTask?, etag: String?, isContinue: Boolean, soFarBytes: Int, totalBytes: Int) {
+                }
+
+                override fun progress(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                    if (totalBytes == -1) {
+                        // chunked transfer encoding data
+                        progressBar_1.isIndeterminate = true
+                    } else {
+                        progressBar_1.max = totalBytes
+                        progressBar_1.progress = soFarBytes
+                    }
+                }
+
+                override fun blockComplete(task: BaseDownloadTask?) {
+                }
+
+                override fun retry(task: BaseDownloadTask?, ex: Throwable?, retryingTimes: Int, soFarBytes: Int) {
+                }
+
+                override fun completed(task: BaseDownloadTask) {
+                    Log.i("linzehao","completed")
+                }
+
+                override fun paused(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                    Log.i("linzehao","paused")
+                }
+
+                override fun error(task: BaseDownloadTask, e: Throwable) {
+                }
+
+                override fun warn(task: BaseDownloadTask) {
+                }
+            }
+        }
+
+
+        progressBar_2.run {
+            downEntity2?.downloadListten =object : DownloadManager2.DownloadListten {
+                override fun pending(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                }
+
+                override fun connected(task: BaseDownloadTask?, etag: String?, isContinue: Boolean, soFarBytes: Int, totalBytes: Int) {
+                }
+
+                override fun progress(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                    if (totalBytes == -1) {
+                        // chunked transfer encoding data
+                        progressBar_2.isIndeterminate = true
+                    } else {
+                        progressBar_2.max = totalBytes
+                        progressBar_2.progress = soFarBytes
+                    }
+                }
+
+                override fun blockComplete(task: BaseDownloadTask?) {
+                }
+
+                override fun retry(task: BaseDownloadTask?, ex: Throwable?, retryingTimes: Int, soFarBytes: Int) {
+                }
+
+                override fun completed(task: BaseDownloadTask) {
+                    Log.i("linzehao","completed")
+                }
+
+                override fun paused(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                    Log.i("linzehao","paused")
+                }
+
+                override fun error(task: BaseDownloadTask, e: Throwable) {
+                }
+
+                override fun warn(task: BaseDownloadTask) {
+                }
+            }
+        }
+
+
+        progressBar_3.run {
+            downEntity3?.downloadListten =object : DownloadManager2.DownloadListten {
+                override fun pending(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                }
+
+                override fun connected(task: BaseDownloadTask?, etag: String?, isContinue: Boolean, soFarBytes: Int, totalBytes: Int) {
+                }
+
+                override fun progress(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                    if (totalBytes == -1) {
+                        // chunked transfer encoding data
+                        progressBar_3.isIndeterminate = true
+                    } else {
+                        progressBar_3.max = totalBytes
+                        progressBar_3.progress = soFarBytes
+                    }
+                }
+
+                override fun blockComplete(task: BaseDownloadTask?) {
+                }
+
+                override fun retry(task: BaseDownloadTask?, ex: Throwable?, retryingTimes: Int, soFarBytes: Int) {
+                }
+
+                override fun completed(task: BaseDownloadTask) {
+                    Log.i("linzehao","completed")
+                }
+
+                override fun paused(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
+                    Log.i("linzehao","paused")
+                }
+
+                override fun error(task: BaseDownloadTask, e: Throwable) {
+                }
+
+                override fun warn(task: BaseDownloadTask) {
+                }
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

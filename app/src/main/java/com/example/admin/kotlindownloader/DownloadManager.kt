@@ -24,7 +24,7 @@ import java.util.concurrent.BlockingQueue
  * 6.一个可视界面
  * 7.统一一个回掉接口，给使用者调用
  * 8.通知化下载
- * 9.暂停
+ * 9.暂停 ，因为在没有开始的任务不会有id,所以，（开始按钮，等待按钮）必须跟暂停按钮是互斥的
  *
  * 考虑功能：
  * 1.在service运行，在activity 运行
@@ -37,7 +37,7 @@ import java.util.concurrent.BlockingQueue
 class DownloadManager private constructor() {
 
     //多任务的队列  最多是doNum个同时进行的任务
-    private val waitQueue: BlockingQueue<String>   by lazy { ArrayBlockingQueue<String>(doNum) }
+    private val waitQueue: BlockingQueue<DownloadEntity>   by lazy { ArrayBlockingQueue<DownloadEntity>(doNum) }
     //默认的路径
     private val defaultPath by lazy { FileDownloadUtils.getDefaultSaveRootPath() + File.separator + "tmpdir1" }
     //最多同时多少个任务同时开启
@@ -66,9 +66,9 @@ class DownloadManager private constructor() {
 //        Log.i(Tag, defaultPath)
     }
 
-    fun addTask(url: String) {
+    fun addTask(entity: DownloadEntity) {
         Thread({
-            waitQueue.put(url)
+            waitQueue.put(entity)
             if (!queueIsLoop) startQueue()
         }).start()
     }
@@ -79,10 +79,11 @@ class DownloadManager private constructor() {
             while (isLoop) {
                 queueIsLoop = true
                 if (currdoNum < doNum) {
-                    var url = waitQueue.poll()
-                    if (!TextUtils.isEmpty(url)) {
+                    var entity = waitQueue.poll()
+                    if (!TextUtils.isEmpty(entity.url)) {
                         currdoNum++
-                        startTask(url)
+                        //这里保存taskId,用来做停止操作
+                        entity.taskId = startTask(entity.url!!)
                     }
 
                 }
@@ -95,11 +96,14 @@ class DownloadManager private constructor() {
     }
 
 
-    private fun startTask(url: String) {
-        FileDownloader.getImpl().create(url)
+    private fun startTask(url: String) :Int  = FileDownloader.getImpl().create(url)
                 .setPath(defaultPath, true)
                 .setListener(queueTarget).start()
+
+    public fun puaseTask(){
+
     }
+
 
     /**
      *
